@@ -43,14 +43,15 @@ func (s *userUsecase) CheckSignIn(email string, password string) (dto.UserRespon
 }
 
 func (s *userUsecase) Create(payloads dto.UserRequest) (model.User, error) {
-	var updateData model.User
+	userData := model.User{
+		Name : payloads.Name,
+		Email : payloads.Email,
+		Password : payloads.Password,
+		PhoneNumber : payloads.PhoneNumber,
+		Role : payloads.Role,
+	}
 
-	updateData.Name = payloads.Name
-	updateData.Email = payloads.Email
-	updateData.Password = payloads.Password
-	updateData.PhoneNumber = payloads.PhoneNumber
-	updateData.Role = payloads.Role
-	userData, err := s.userRepository.Create(updateData)
+	userData, err := s.userRepository.Create(userData)
 	if err != nil {
 		return model.User{}, err
 	}

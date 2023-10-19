@@ -1,0 +1,92 @@
+package usecase
+
+import (
+	// "errors"
+
+	"go-mini-project/dto"
+	// "go-mini-project/middleware"
+	"go-mini-project/model"
+	"go-mini-project/repository"
+)
+
+type BookUsecase interface {
+	Get(title, author string) ([]model.Book, error)
+	GetById(id int) (model.Book, error)
+	Create(payloads dto.BookRequest) (model.Book, error)
+	Update(payloads dto.BookRequest, id int) (model.Book, error)
+	Delete(id int) error
+}
+
+type bookUsecase struct {
+	bookRepository repository.BookRepository
+}
+
+func NewBookUsecase(bookRepo repository.BookRepository) *bookUsecase {
+	return &bookUsecase{bookRepository: bookRepo}
+}
+
+func (s *bookUsecase) Get(title, author string) ([]model.Book, error) {
+	bookData, err := s.bookRepository.Get(title, author)
+	if err != nil {
+		return []model.Book{}, err
+	}
+
+	return bookData, nil
+}
+
+func (s *bookUsecase) GetById(id int) (model.Book, error) {
+	bookData, err := s.bookRepository.GetById(id)
+	if err != nil {
+		return model.Book{}, err
+	}
+
+	return bookData, nil
+}
+
+func (s *bookUsecase) Create(payloads dto.BookRequest) (model.Book, error) {
+	bookData := model.Book{
+		Title : payloads.Title,
+		Author : payloads.Author,
+		Price : payloads.Price,
+		Stock : payloads.Stock,
+	}
+
+	bookData, err := s.bookRepository.Create(bookData)
+	if err != nil {
+		return model.Book{}, err
+	}
+	return bookData, nil
+}
+
+func (s *bookUsecase) Update(payloads dto.BookRequest, id int) (model.Book, error) {
+	_, err := s.bookRepository.GetById(id)
+	if err != nil {
+		return model.Book{}, err
+	}
+	
+	bookData := model.Book{
+		Title : payloads.Title,
+		Author : payloads.Author,
+		Price : payloads.Price,
+		Stock : payloads.Stock,
+	}
+
+	bookData, err = s.bookRepository.Update(bookData, id)
+	if err != nil {
+		return model.Book{}, err
+	}
+	return bookData, nil
+}
+
+func (s *bookUsecase) Delete(id int) error {
+	_, err := s.bookRepository.GetById(id)
+	if err != nil {
+		return err
+	}
+
+	err = s.bookRepository.Delete(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

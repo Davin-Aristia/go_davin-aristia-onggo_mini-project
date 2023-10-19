@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
 	
 	"go-mini-project/config"
 )
@@ -21,4 +22,14 @@ func CreateToken(userId int, name, email, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// return bersama token ketiga (dengan secret key)
 	return token.SignedString([]byte(config.JWT_KEY))
+}
+
+func ExtractTokenUserRole(e echo.Context) string {
+	user := e.Get("user").(*jwt.Token)
+	if user.Valid {
+		claims := user.Claims.(jwt.MapClaims)
+		role := claims["role"].(string)
+		return role
+	}
+	return "customer"
 }
