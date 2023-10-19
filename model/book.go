@@ -12,6 +12,7 @@ type Book struct {
 	Author string `json:"author" validate:"required"`
 	Price  int `json:"price" validate:"required"`
 	Stock  int `json:"stock" validate:"required"`
+	CategoryId uint `json:"categoryId" validate:"required"`
 }
 
 func ValidateBookRequest(book *Book) error {

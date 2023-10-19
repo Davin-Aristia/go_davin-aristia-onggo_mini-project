@@ -49,6 +49,7 @@ func (s *bookUsecase) Create(payloads dto.BookRequest) (model.Book, error) {
 		Author : payloads.Author,
 		Price : payloads.Price,
 		Stock : payloads.Stock,
+		CategoryId : uint(payloads.CategoryId),
 	}
 
 	bookData, err := s.bookRepository.Create(bookData)
@@ -69,6 +70,7 @@ func (s *bookUsecase) Update(payloads dto.BookRequest, id int) (model.Book, erro
 		Author : payloads.Author,
 		Price : payloads.Price,
 		Stock : payloads.Stock,
+		CategoryId : uint(payloads.CategoryId),
 	}
 
 	bookData, err = s.bookRepository.Update(bookData, id)

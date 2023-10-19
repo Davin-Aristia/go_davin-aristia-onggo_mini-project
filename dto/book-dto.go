@@ -1,16 +1,9 @@
 package dto
 
 type BookRequest struct {
-	Title  string `json:"title" form:"required"`
-	Author string `json:"author" form:"required"`
-	Price  int `json:"price" form:"required"`
-	Stock  int `json:"stock" form:"required"`
-}
-
-type BookResponse struct {
-	ID 	uint `json:"id" form:"id"`
-	Title  string `json:"title" form:"required"`
-	Author string `json:"author" form:"required"`
-	Price  int `json:"price" form:"required"`
-	Stock  int `json:"stock" form:"required"`
+	Title  string `json:"title" form:"title"`
+	Author string `json:"author" form:"author"`
+	Price  int `json:"price" form:"price"`
+	Stock  int `json:"stock" form:"stock"`
+	CategoryId  int `json:"category" form:"category"`
 }

@@ -45,5 +45,6 @@ func MigrateDB(db *gorm.DB) error {
 	return db.AutoMigrate(
 		model.User{},
 		model.Book{},
+		model.Category{},
 	)
 }
