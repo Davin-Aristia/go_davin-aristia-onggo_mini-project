@@ -13,6 +13,7 @@ type Sales struct {
 	Invoice string `json:"invoice" validate:"required" gorm:"unique_index"`
 	Date time.Time `json:"date" validate:"required"`
 	Total float64 `json:"total" validate:"required"`
+	SalesDetails []SalesDetail `gorm:foreignKey:SalesId`
 }
 
 func ValidateSalesRequest(sales *Sales) error {

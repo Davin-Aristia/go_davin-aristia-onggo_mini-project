@@ -13,6 +13,7 @@ type User struct {
 	Password string `json:"password" validate:"required"`
 	PhoneNumber string `json:"phoneNumber" validate:"required"`
 	Role string `json:"role" gorm:"type:enum('customer','admin');default:'customer'"`
+	Sales []Sales `gorm:foreignKey:UserId`
 }
 
 func ValidateUserRequest(user *User) error {

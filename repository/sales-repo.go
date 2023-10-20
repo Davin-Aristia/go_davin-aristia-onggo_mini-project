@@ -14,6 +14,18 @@ type SalesRepository interface {
 	GetById(id int) (model.Sales, error)
 	Create(data model.Sales) (model.Sales, error)
 	GenerateNextInvoice() (string, error)
+
+	// BeginTransaction starts a database transaction and returns a reference to it.
+    BeginTransaction() *gorm.DB
+
+    // CreateWithTransaction creates a new sales record within the given transaction.
+    CreateWithTransaction(sales model.Sales, tx *gorm.DB) (model.Sales, error)
+
+    // CreateSalesDetailWithTransaction creates a new sales detail record within the given transaction.
+    CreateSalesDetailWithTransaction(salesDetail model.SalesDetail, tx *gorm.DB) error
+
+    // CommitTransaction commits the provided transaction.
+    CommitTransaction(tx *gorm.DB) error
 }
 
 type salesRepository struct {
@@ -37,7 +49,7 @@ func (r *salesRepository) Get(invoice string, user int) ([]model.Sales, error) {
         tx = tx.Where("user_id = ?", user)
     }
 
-	tx.Find(&salesData)
+	tx.Preload("SalesDetails").Find(&salesData)
 	if tx.Error != nil {
 		return []model.Sales{}, tx.Error
 	}
@@ -98,4 +110,42 @@ func (r *salesRepository) GenerateNextInvoice() (string, error) {
     }
 
     return formattedInvoice, nil
+}
+
+func (r *salesRepository) BeginTransaction() *gorm.DB {
+    return r.db.Begin()
+}
+
+// CreateWithTransaction creates a new sales record within the given transaction.
+func (r *salesRepository) CreateWithTransaction(sales model.Sales, tx *gorm.DB) (model.Sales, error) {
+	err := model.ValidateSalesRequest(&sales)
+	if err != nil {
+		return model.Sales{}, err
+	}
+	
+    if err := tx.Create(&sales).Error; err != nil {
+        return model.Sales{}, err
+    }
+    return sales, nil
+}
+
+// CreateSalesDetailWithTransaction creates a new sales detail record within the given transaction.
+func (r *salesRepository) CreateSalesDetailWithTransaction(salesDetail model.SalesDetail, tx *gorm.DB) error {
+	err := model.ValidateSalesDetailRequest(&salesDetail)
+	if err != nil {
+		return err
+	}
+
+    if err := tx.Create(&salesDetail).Error; err != nil {
+        return err
+    }
+    return nil
+}
+
+// CommitTransaction commits the provided transaction.
+func (r *salesRepository) CommitTransaction(tx *gorm.DB) error {
+    if err := tx.Commit().Error; err != nil {
+        return err
+    }
+    return nil
 }
