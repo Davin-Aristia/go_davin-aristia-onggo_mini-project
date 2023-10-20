@@ -1,7 +1,8 @@
 package usecase
 
 import (
-	// "errors"
+	"errors"
+	"strconv"
 
 	"go-mini-project/dto"
 	// "go-mini-project/middleware"
@@ -10,7 +11,7 @@ import (
 )
 
 type BookUsecase interface {
-	Get(title, author string) ([]model.Book, error)
+	Get(title, author, category string) ([]model.Book, error)
 	GetById(id int) (model.Book, error)
 	Create(payloads dto.BookRequest) (model.Book, error)
 	Update(payloads dto.BookRequest, id int) (model.Book, error)
@@ -25,8 +26,17 @@ func NewBookUsecase(bookRepo repository.BookRepository) *bookUsecase {
 	return &bookUsecase{bookRepository: bookRepo}
 }
 
-func (s *bookUsecase) Get(title, author string) ([]model.Book, error) {
-	bookData, err := s.bookRepository.Get(title, author)
+func (s *bookUsecase) Get(title, author, category string) ([]model.Book, error) {
+	categ := 0
+	var err error
+	if category != ""{
+		categ, err = strconv.Atoi(category)
+		if err != nil {
+			return []model.Book{}, errors.New("category must be an integer")
+		}
+	}
+
+	bookData, err := s.bookRepository.Get(title, author, categ)
 	if err != nil {
 		return []model.Book{}, err
 	}
@@ -49,6 +59,7 @@ func (s *bookUsecase) Create(payloads dto.BookRequest) (model.Book, error) {
 		Author : payloads.Author,
 		Price : payloads.Price,
 		Stock : payloads.Stock,
+		CategoryId : uint(payloads.CategoryId),
 	}
 
 	bookData, err := s.bookRepository.Create(bookData)
@@ -69,6 +80,7 @@ func (s *bookUsecase) Update(payloads dto.BookRequest, id int) (model.Book, erro
 		Author : payloads.Author,
 		Price : payloads.Price,
 		Stock : payloads.Stock,
+		CategoryId : uint(payloads.CategoryId),
 	}
 
 	bookData, err = s.bookRepository.Update(bookData, id)

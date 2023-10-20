@@ -8,7 +8,7 @@ import (
 )
 
 type BookRepository interface {
-	Get(title, author string) ([]model.Book, error)
+	Get(title, author string, category int) ([]model.Book, error)
 	GetById(id int) (model.Book, error)
 	Create(data model.Book) (model.Book, error)
 	Update(data model.Book, ID int) (model.Book, error)
@@ -23,7 +23,7 @@ func NewBookRepository(db *gorm.DB) *bookRepository {
 	return &bookRepository{db}
 }
 
-func (r *bookRepository) Get(title, author string) ([]model.Book, error) {
+func (r *bookRepository) Get(title, author string, category int) ([]model.Book, error) {
 	var bookData []model.Book
 
 	tx := r.db
@@ -34,6 +34,10 @@ func (r *bookRepository) Get(title, author string) ([]model.Book, error) {
 
     if author != "" {
         tx = tx.Where("author LIKE ?", "%"+author+"%")
+    }
+
+    if category != 0 {
+        tx = tx.Where("category_id = ?", category)
     }
 
 	tx.Find(&bookData)

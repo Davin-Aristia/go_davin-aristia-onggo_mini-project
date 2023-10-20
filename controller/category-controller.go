@@ -11,55 +11,53 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type BookController interface{}
+type CategoryController interface{}
 
-type bookController struct {
-	useCase usecase.BookUsecase
+type categoryController struct {
+	useCase usecase.CategoryUsecase
 }
 
-func NewBookController(bookUsecase usecase.BookUsecase) *bookController {
-	return &bookController{
-		bookUsecase,
+func NewCategoryController(categoryUsecase usecase.CategoryUsecase) *categoryController {
+	return &categoryController{
+		categoryUsecase,
 	}
 }
 
-func (u *bookController) GetBooks(c echo.Context) error {
-	title := c.FormValue("title")
-	author := c.FormValue("author")
-	category := c.FormValue("category")
+func (u *categoryController) GetCategories(c echo.Context) error {
+	name := c.FormValue("name")
 	
-	book, err := u.useCase.Get(title, author, category)
+	category, err := u.useCase.Get(name)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
-			"message": "failed get books",
+			"message": "failed get categories",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
-		"message": "success get books",
-		"book":    book,
+		"message": "success get categories",
+		"category":    category,
 	})
 }
 
-func (u *bookController) GetBookById(c echo.Context) error {
+func (u *categoryController) GetCategoryById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	
-	book, err := u.useCase.GetById(id)
+	category, err := u.useCase.GetById(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
-			"message": "failed get book",
+			"message": "failed get category",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
-		"message": "success get book",
-		"book":    book,
+		"message": "success get category",
+		"category":    category,
 	})
 }
 
-func (u *bookController) InsertBook(c echo.Context) error {
+func (u *categoryController) InsertCategory(c echo.Context) error {
 	role := middleware.ExtractTokenUserRole(c)
 	if role != "admin"{
 		return c.JSON(http.StatusUnauthorized, map[string]any{
@@ -67,7 +65,7 @@ func (u *bookController) InsertBook(c echo.Context) error {
 		})
 	}
 
-	var payloads dto.BookRequest
+	var payloads dto.CategoryRequest
 
 	if err := c.Bind(&payloads); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
@@ -75,21 +73,21 @@ func (u *bookController) InsertBook(c echo.Context) error {
 		})
 	}
 
-	book, err := u.useCase.Create(payloads)
+	category, err := u.useCase.Create(payloads)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
-			"message": "failed create book",
+			"message": "failed create category",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
-		"message": "success create book",
-		"book":    book,
+		"message": "success create category",
+		"category":    category,
 	})
 }
 
-func (u *bookController) UpdateBook(c echo.Context) error {
+func (u *categoryController) UpdateCategory(c echo.Context) error {
 	role := middleware.ExtractTokenUserRole(c)
 	if role != "admin"{
 		return c.JSON(http.StatusUnauthorized, map[string]any{
@@ -97,7 +95,7 @@ func (u *bookController) UpdateBook(c echo.Context) error {
 		})
 	}
 	
-	var payloads dto.BookRequest
+	var payloads dto.CategoryRequest
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -113,21 +111,21 @@ func (u *bookController) UpdateBook(c echo.Context) error {
 		})
 	}
 
-	book, err := u.useCase.Update(payloads, id)
+	category, err := u.useCase.Update(payloads, id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
-			"message": "failed update book",
+			"message": "failed update category",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
-		"message": "success update book",
-		"book":    book,
+		"message": "success update category",
+		"category":    category,
 	})
 }
 
-func (u *bookController) DeleteBook(c echo.Context) error {
+func (u *categoryController) DeleteCategory(c echo.Context) error {
 	role := middleware.ExtractTokenUserRole(c)
 	if role != "admin"{
 		return c.JSON(http.StatusUnauthorized, map[string]any{
@@ -146,12 +144,12 @@ func (u *bookController) DeleteBook(c echo.Context) error {
 	err = u.useCase.Delete(id)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
-			"message": "failed delete book",
+			"message": "failed delete category",
 			"error":   err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]any{
-		"message": "success delete book",
+		"message": "success delete category",
 	})
 }
