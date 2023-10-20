@@ -24,6 +24,16 @@ func CreateToken(userId int, name, email, role string) (string, error) {
 	return token.SignedString([]byte(config.JWT_KEY))
 }
 
+func ExtractTokenUserId(e echo.Context) int {
+	user := e.Get("user").(*jwt.Token)
+	if user.Valid {
+		claims := user.Claims.(jwt.MapClaims)
+		userId := claims["userId"].(float64)
+		return int(userId)
+	}
+	return 0
+}
+
 func ExtractTokenUserRole(e echo.Context) string {
 	user := e.Get("user").(*jwt.Token)
 	if user.Valid {

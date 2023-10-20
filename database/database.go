@@ -46,5 +46,6 @@ func MigrateDB(db *gorm.DB) error {
 		model.User{},
 		model.Book{},
 		model.Category{},
+		model.Sales{},
 	)
 }

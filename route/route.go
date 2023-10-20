@@ -26,6 +26,10 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	categoryService := usecase.NewCategoryUsecase(categoryRepository)
 	categoryController := controller.NewCategoryController(categoryService)
 
+	salesRepository := repository.NewSalesRepository(db)
+	salesService := usecase.NewSalesUsecase(salesRepository)
+	salesController := controller.NewSalesController(salesService)
+
 	//JWT Group
 	r := e.Group("")
 	r.Use(middleware.JWT([]byte(config.JWT_KEY)))
@@ -45,4 +49,8 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	r.POST("/categories", categoryController.InsertCategory)
 	r.PUT("/categories/:id", categoryController.UpdateCategory)
 	r.DELETE("/categories/:id", categoryController.DeleteCategory)
+
+	r.POST("/checkout", salesController.Checkout)
+	r.GET("/sales/:id", salesController.GetSalesById)
+	r.GET("/sales", salesController.GetSales)
 }
