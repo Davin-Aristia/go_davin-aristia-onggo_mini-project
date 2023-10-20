@@ -26,8 +26,9 @@ func NewBookController(bookUsecase usecase.BookUsecase) *bookController {
 func (u *bookController) GetBooks(c echo.Context) error {
 	title := c.FormValue("title")
 	author := c.FormValue("author")
+	category := c.FormValue("category")
 	
-	book, err := u.useCase.Get(title, author)
+	book, err := u.useCase.Get(title, author, category)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
 			"message": "failed get books",
