@@ -10,8 +10,8 @@ type Book struct {
 
 	Title  string `json:"title" validate:"required"`
 	Author string `json:"author" validate:"required"`
-	Price  int `json:"price" validate:"required"`
-	Stock  int `json:"stock" validate:"required"`
+	Price  float64 `json:"price" validate:"required"`
+	Stock  int `json:"stock"`
 	CategoryId uint `json:"categoryId" validate:"required"`
 }
 
