@@ -11,7 +11,7 @@ type CategoryRepository interface {
 	Get(name string) ([]model.Category, error)
 	GetById(id int) (model.Category, error)
 	Create(data model.Category) (model.Category, error)
-	Update(data model.Category, ID int) (model.Category, error)
+	Update(data model.Category, ID int) error
 	Delete(id int) error
 }
 
@@ -63,12 +63,12 @@ func (r *categoryRepository) Create(data model.Category) (model.Category, error)
 	return data, nil
 }
 
-func (r *categoryRepository) Update(data model.Category, id int) (model.Category, error) {
+func (r *categoryRepository) Update(data model.Category, id int) error {
 	tx := r.db.Model(&data).Where("id = ?", id).Updates(data)
 	if tx.Error != nil {
-		return model.Category{}, tx.Error
+		return tx.Error
 	}
-	return data, nil
+	return nil
 }
 
 func (r *categoryRepository) Delete(id int) error {

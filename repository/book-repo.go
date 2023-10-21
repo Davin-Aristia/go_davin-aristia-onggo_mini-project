@@ -11,7 +11,7 @@ type BookRepository interface {
 	Get(title, author string, category int) ([]model.Book, error)
 	GetById(id int) (model.Book, error)
 	Create(data model.Book) (model.Book, error)
-	Update(data model.Book, ID int) (model.Book, error)
+	Update(data model.Book, ID int) error
 	Delete(id int) error
 }
 
@@ -71,12 +71,12 @@ func (r *bookRepository) Create(data model.Book) (model.Book, error) {
 	return data, nil
 }
 
-func (r *bookRepository) Update(data model.Book, id int) (model.Book, error) {
+func (r *bookRepository) Update(data model.Book, id int) error {
 	tx := r.db.Model(&data).Where("id = ?", id).Updates(data)
 	if tx.Error != nil {
-		return model.Book{}, tx.Error
+		return tx.Error
 	}
-	return data, nil
+	return nil
 }
 
 func (r *bookRepository) Delete(id int) error {

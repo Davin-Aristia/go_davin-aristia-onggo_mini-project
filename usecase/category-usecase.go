@@ -65,10 +65,16 @@ func (s *categoryUsecase) Update(payloads dto.CategoryRequest, id int) (model.Ca
 		Name : payloads.Name,
 	}
 
-	categoryData, err = s.categoryRepository.Update(categoryData, id)
+	err = s.categoryRepository.Update(categoryData, id)
 	if err != nil {
 		return model.Category{}, err
 	}
+
+	categoryData, err = s.categoryRepository.GetById(id)
+	if err != nil {
+		return model.Category{}, err
+	}
+	
 	return categoryData, nil
 }
 

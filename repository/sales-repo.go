@@ -7,24 +7,21 @@ import (
 	"gorm.io/gorm"
 	"time"
 	"fmt"
+    "errors"
+    "strconv"
 )
 
 type SalesRepository interface {
 	Get(invoice string, user int) ([]model.Sales, error)
 	GetById(id int) (model.Sales, error)
-	Create(data model.Sales) (model.Sales, error)
+	
 	GenerateNextInvoice() (string, error)
 
-	// BeginTransaction starts a database transaction and returns a reference to it.
     BeginTransaction() *gorm.DB
-
-    // CreateWithTransaction creates a new sales record within the given transaction.
     CreateWithTransaction(sales model.Sales, tx *gorm.DB) (model.Sales, error)
-
-    // CreateSalesDetailWithTransaction creates a new sales detail record within the given transaction.
     CreateSalesDetailWithTransaction(salesDetail model.SalesDetail, tx *gorm.DB) error
-
-    // CommitTransaction commits the provided transaction.
+    DeductBookStockWithTransaction(bookID uint, quantity int, tx *gorm.DB) error
+	UpdateTotalWithTransaction(ID uint, total float64, tx *gorm.DB) error
     CommitTransaction(tx *gorm.DB) error
 }
 
@@ -59,7 +56,7 @@ func (r *salesRepository) Get(invoice string, user int) ([]model.Sales, error) {
 func (r *salesRepository) GetById(id int) (model.Sales, error) {
 	var salesData model.Sales
 
-	tx := r.db.First(&salesData, id)
+	tx := r.db.Preload("SalesDetails").First(&salesData, id)
 
 	if tx.Error != nil {
 		return model.Sales{}, tx.Error
@@ -67,45 +64,26 @@ func (r *salesRepository) GetById(id int) (model.Sales, error) {
 	return salesData, nil
 }
 
-func (r *salesRepository) Create(data model.Sales) (model.Sales, error) {
-	err := model.ValidateSalesRequest(&data)
-	if err != nil {
-		return model.Sales{}, err
-	}
-
-	tx := r.db.Save(&data)
-	if tx.Error != nil {
-		return model.Sales{}, tx.Error
-	}
-	return data, nil
-}
-
 func (r *salesRepository) GenerateNextInvoice() (string, error) {
-    // Get the current date components
     now := time.Now()
     year, month, day := now.Year(), now.Month(), now.Day()
 
-    // Construct the desired format
     formattedInvoice := fmt.Sprintf("INV/%d/%02d/%02d/", year, month, day)
 
-    // Find the last invoice with the same date prefix
     var lastInvoice model.Sales
     if err := r.db.Where("invoice LIKE ?", formattedInvoice+"%").Order("invoice DESC").First(&lastInvoice).Error; err != nil {
         if err == gorm.ErrRecordNotFound {
-            // If no invoice found, start with 0001
             formattedInvoice += "0001"
         } else {
             return "", err
         }
     } else {
-        // Extract the sequence from the last invoice
         var sequence int
         _, err := fmt.Sscanf(lastInvoice.Invoice, formattedInvoice+"%04d", &sequence)
         if err != nil {
             return "", err
         }
 
-        // Increment the sequence for the new invoice
         formattedInvoice += fmt.Sprintf("%04d", sequence+1)
     }
 
@@ -116,7 +94,6 @@ func (r *salesRepository) BeginTransaction() *gorm.DB {
     return r.db.Begin()
 }
 
-// CreateWithTransaction creates a new sales record within the given transaction.
 func (r *salesRepository) CreateWithTransaction(sales model.Sales, tx *gorm.DB) (model.Sales, error) {
 	err := model.ValidateSalesRequest(&sales)
 	if err != nil {
@@ -129,7 +106,6 @@ func (r *salesRepository) CreateWithTransaction(sales model.Sales, tx *gorm.DB) 
     return sales, nil
 }
 
-// CreateSalesDetailWithTransaction creates a new sales detail record within the given transaction.
 func (r *salesRepository) CreateSalesDetailWithTransaction(salesDetail model.SalesDetail, tx *gorm.DB) error {
 	err := model.ValidateSalesDetailRequest(&salesDetail)
 	if err != nil {
@@ -142,10 +118,38 @@ func (r *salesRepository) CreateSalesDetailWithTransaction(salesDetail model.Sal
     return nil
 }
 
-// CommitTransaction commits the provided transaction.
+func (r *salesRepository) DeductBookStockWithTransaction(bookID uint, quantity int, tx *gorm.DB) error {
+	var book model.Book
+	if err := tx.First(&book, bookID).Error; err != nil {
+		return err
+	}
+
+	if book.Stock < quantity {
+		return errors.New("Insufficient stock for '" + book.Title + "'. Remaining Stock: " + strconv.Itoa(book.Stock) + ". Quantity requested: "+ strconv.Itoa(quantity))
+	}
+
+	book.Stock -= quantity
+
+	if err := tx.Save(&book).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *salesRepository) UpdateTotalWithTransaction(ID uint, total float64, tx *gorm.DB) error {
+	var sales model.Sales
+
+	if err:= tx.Model(&sales).Where("id = ?", ID).Updates(map[string]interface{}{"total":total}). Error; err != nil{
+		return tx.Error
+	}
+	return nil
+}
+
 func (r *salesRepository) CommitTransaction(tx *gorm.DB) error {
     if err := tx.Commit().Error; err != nil {
         return err
     }
     return nil
 }
+

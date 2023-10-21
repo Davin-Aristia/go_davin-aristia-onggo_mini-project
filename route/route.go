@@ -27,7 +27,7 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	categoryController := controller.NewCategoryController(categoryService)
 
 	salesRepository := repository.NewSalesRepository(db)
-	salesService := usecase.NewSalesUsecase(salesRepository)
+	salesService := usecase.NewSalesUsecase(salesRepository, bookRepository)
 	salesController := controller.NewSalesController(salesService)
 
 	//JWT Group

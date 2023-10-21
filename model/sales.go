@@ -12,7 +12,7 @@ type Sales struct {
 	UserId uint `json:"userId" validate:"required"`
 	Invoice string `json:"invoice" validate:"required" gorm:"unique_index"`
 	Date time.Time `json:"date" validate:"required"`
-	Total float64 `json:"total" validate:"required"`
+	Total float64 `json:"total"`
 	SalesDetails []SalesDetail `gorm:foreignKey:SalesId`
 }
 

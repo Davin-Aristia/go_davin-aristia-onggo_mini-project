@@ -18,10 +18,14 @@ type SalesUsecase interface {
 
 type salesUsecase struct {
 	salesRepository repository.SalesRepository
+	bookRepository repository.BookRepository
 }
 
-func NewSalesUsecase(salesRepo repository.SalesRepository) *salesUsecase {
-	return &salesUsecase{salesRepository: salesRepo}
+func NewSalesUsecase(salesRepo repository.SalesRepository, bookRepo repository.BookRepository) *salesUsecase {
+	return &salesUsecase{
+		salesRepository: salesRepo,
+		bookRepository: bookRepo,
+	}
 }
 
 func (s *salesUsecase) Get(invoice, user, role string) ([]model.Sales, error) {
@@ -55,28 +59,7 @@ func (s *salesUsecase) GetById(id, user int, role string) (model.Sales, error) {
 	return salesData, nil
 }
 
-// func (s *salesUsecase) Create(payloads dto.SalesRequest, user int) (model.Sales, error) {
-// 	invoice, err := s.salesRepository.GenerateNextInvoice()
-// 	if err != nil {
-// 		return model.Sales{}, err
-// 	}
-
-// 	salesData := model.Sales{
-// 		UserId : uint(user),
-// 		Invoice : invoice,
-// 		Date : time.Now(),
-// 		Total : payloads.Total,
-// 	}
-
-// 	salesData, err = s.salesRepository.Create(salesData)
-// 	if err != nil {
-// 		return model.Sales{}, err
-// 	}
-// 	return salesData, nil
-// }
-
 func (s *salesUsecase) Create(payloads dto.SalesRequest, user int) (model.Sales, error) {
-	// Start a database transaction
 	tx := s.salesRepository.BeginTransaction()
 	if tx.Error != nil {
 		return model.Sales{}, tx.Error
@@ -88,43 +71,60 @@ func (s *salesUsecase) Create(payloads dto.SalesRequest, user int) (model.Sales,
 		return model.Sales{}, err
 	}
 
-	// Calculate the total from the sales details' subtotals
-	total := 0.0
-	for _, detail := range payloads.Details {
-		total += detail.Subtotal
-	}
-
 	salesData := model.Sales{
 		UserId:  uint(user),
 		Invoice: invoice,
 		Date:    time.Now(),
-		Total:   total,
+		Total:   0.0,
 	}
 
-	// Create the sales record within the transaction
 	salesData, err = s.salesRepository.CreateWithTransaction(salesData, tx)
 	if err != nil {
 		return model.Sales{}, err
 	}
 
-	// Create the sales details within the transaction
+	total := 0.0
 	for _, detail := range payloads.Details {
+		bookData, err := s.bookRepository.GetById(int(detail.BookID))
+		if err != nil {
+			return model.Sales{}, err
+		}
+
+		subtotal := bookData.Price * float64(detail.Quantity)
+
 		salesDetail := model.SalesDetail{
 			SalesId:  salesData.ID,
 			BookId:   detail.BookID,
-			Price:    detail.Price,
+			Price:    bookData.Price,
 			Quantity: detail.Quantity,
-			Subtotal: detail.Subtotal,
+			Subtotal: subtotal,
 		}
 
 		// Create the sales detail record within the transaction
 		if err := s.salesRepository.CreateSalesDetailWithTransaction(salesDetail, tx); err != nil {
 			return model.Sales{}, err
 		}
+
+		// Deduct the stock of the book based on the quantity sold
+		if err := s.salesRepository.DeductBookStockWithTransaction(detail.BookID, detail.Quantity, tx); err != nil {
+			return model.Sales{}, err
+		}
+
+		total += subtotal
+	}
+
+	err = s.salesRepository.UpdateTotalWithTransaction(salesData.ID, total, tx)
+	if err != nil {
+		return model.Sales{}, err
 	}
 
 	// Commit the transaction if everything was successful
 	if err := s.salesRepository.CommitTransaction(tx); err != nil {
+		return model.Sales{}, err
+	}
+
+	salesData, err = s.salesRepository.GetById(int(salesData.ID))
+	if err != nil {
 		return model.Sales{}, err
 	}
 

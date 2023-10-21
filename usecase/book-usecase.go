@@ -83,10 +83,17 @@ func (s *bookUsecase) Update(payloads dto.BookRequest, id int) (model.Book, erro
 		CategoryId : uint(payloads.CategoryId),
 	}
 
-	bookData, err = s.bookRepository.Update(bookData, id)
+	err = s.bookRepository.Update(bookData, id)
 	if err != nil {
 		return model.Book{}, err
 	}
+
+	//recall the GetById repo because if I return it from update, it only fill the updated field and leaves everything else null or 0
+	bookData , err = s.bookRepository.GetById(id)
+	if err != nil {
+		return model.Book{}, err
+	}
+
 	return bookData, nil
 }
 
