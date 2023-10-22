@@ -11,7 +11,7 @@ import (
 )
 
 type SalesUsecase interface {
-	Get(invoice, user, role string) ([]model.Sales, error)
+	Get(invoice, user string) ([]model.Sales, error)
 	GetById(id, user int, role string) (model.Sales, error)
 	Create(payloads dto.SalesRequest, user int) (model.Sales, error)
 }
@@ -28,7 +28,7 @@ func NewSalesUsecase(salesRepo repository.SalesRepository, bookRepo repository.B
 	}
 }
 
-func (s *salesUsecase) Get(invoice, user, role string) ([]model.Sales, error) {
+func (s *salesUsecase) Get(invoice, user string) ([]model.Sales, error) {
 	userId := 0
 	var err error
 	if user != ""{

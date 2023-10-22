@@ -44,10 +44,12 @@ func ConnectDB() (*gorm.DB, error) {
 func MigrateDB(db *gorm.DB) error {
 	return db.AutoMigrate(
 		model.User{},
-		model.Book{},
 		model.Category{},
+		model.Book{},
 		model.Sales{},
 		model.SalesDetail{},
 		model.Vendor{},
+		model.Purchase{},
+		model.PurchaseDetail{},
 	)
 }

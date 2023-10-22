@@ -8,10 +8,11 @@ import (
 type Vendor struct {
 	*gorm.Model
 
-	Name    string `json:"name" validate:"required"`
-	Address    string `json:"address" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	Name    	string 		`json:"name" validate:"required" gorm:"type:varchar(255)"`
+	Address    	string 		`json:"address" validate:"required" gorm:"type:varchar(255)"`
+	Email    	string 		`json:"email" validate:"required,email" gorm:"type:varchar(255)"`
+	PhoneNumber string 		`json:"phoneNumber" validate:"required" gorm:"type:varchar(20)"`
+	Purchases 	[]Purchase  `gorm:foreignKey:VendorId`
 }
 
 func ValidateVendorRequest(vendor *Vendor) error {
