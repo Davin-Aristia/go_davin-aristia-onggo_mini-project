@@ -128,10 +128,10 @@ func (r *salesRepository) DeductBookStockWithTransaction(bookID uint, quantity i
 		return errors.New("Insufficient stock for '" + book.Title + "'. Remaining Stock: " + strconv.Itoa(book.Stock) + ". Quantity requested: "+ strconv.Itoa(quantity))
 	}
 
-	remaining_qty := book.Stock - quantity
+	book.Stock -= quantity
 
-	if err:= tx.Model(&book).Where("id = ?", bookID).Updates(map[string]interface{}{"stock":remaining_qty}). Error; err != nil{
-		return tx.Error
+	if err := tx.Save(&book).Error; err != nil {
+		return err
 	}
 
 	return nil
