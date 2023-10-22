@@ -41,7 +41,7 @@ func (u *salesController) GetSales(c echo.Context) error {
 		userId = strconv.Itoa(user)
 	}
 	
-	sales, err := u.useCase.Get(invoice, userId, role)
+	sales, err := u.useCase.Get(invoice, userId)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]any{
 			"message": "failed get sales",

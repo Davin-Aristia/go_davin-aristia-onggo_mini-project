@@ -29,10 +29,14 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	salesRepository := repository.NewSalesRepository(db)
 	salesService := usecase.NewSalesUsecase(salesRepository, bookRepository)
 	salesController := controller.NewSalesController(salesService)
-
+	
 	vendorRepository := repository.NewVendorRepository(db)
 	vendorService := usecase.NewVendorUsecase(vendorRepository)
 	vendorController := controller.NewVendorController(vendorService)
+	
+	purchaseRepository := repository.NewPurchaseRepository(db)
+	purchaseService := usecase.NewPurchaseUsecase(purchaseRepository, bookRepository)
+	purchaseController := controller.NewPurchaseController(purchaseService)
 
 	//JWT Group
 	r := e.Group("")
@@ -57,10 +61,14 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	r.POST("/checkout", salesController.Checkout)
 	r.GET("/sales/:id", salesController.GetSalesById)
 	r.GET("/sales", salesController.GetSales)
-
+	
 	r.GET("/vendors", vendorController.GetVendors)
 	r.GET("/vendors/:id", vendorController.GetVendorById)
 	r.POST("/vendors", vendorController.InsertVendor)
 	r.PUT("/vendors/:id", vendorController.UpdateVendor)
 	r.DELETE("/vendors/:id", vendorController.DeleteVendor)
+	
+	r.POST("/purchases", purchaseController.CreatePurchase)
+	r.GET("/purchases/:id", purchaseController.GetPurchaseById)
+	r.GET("/purchases", purchaseController.GetPurchase)
 }

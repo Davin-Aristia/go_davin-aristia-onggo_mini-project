@@ -8,12 +8,12 @@ import (
 type User struct {
 	*gorm.Model
 
-	Name    string `json:"name" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-	PhoneNumber string `json:"phoneNumber" validate:"required"`
-	Role string `json:"role" gorm:"type:enum('customer','admin');default:'customer'"`
-	Sales []Sales `gorm:foreignKey:UserId`
+	Name    	string  `json:"name" validate:"required" gorm:"type:varchar(255)"`
+	Email    	string  `json:"email" validate:"required,email" gorm:"type:varchar(255)"`
+	Password 	string  `json:"password" validate:"required" gorm:"type:varchar(100)"`
+	PhoneNumber string  `json:"phoneNumber" validate:"required" gorm:"type:varchar(20)"`
+	Role 		string  `json:"role" gorm:"type:enum('customer','admin');default:'customer'"`
+	Sales 		[]Sales `gorm:foreignKey:UserId`
 }
 
 func ValidateUserRequest(user *User) error {
