@@ -43,3 +43,13 @@ func ExtractTokenUserRole(e echo.Context) string {
 	}
 	return "customer"
 }
+
+func ExtractTokenUserEmail(e echo.Context) string {
+	user := e.Get("user").(*jwt.Token)
+	if user.Valid {
+		claims := user.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		return email
+	}
+	return ""
+}

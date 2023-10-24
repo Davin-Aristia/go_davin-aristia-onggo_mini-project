@@ -46,7 +46,10 @@ func (u *userController) SignUp(c echo.Context) error {
 
 	emailBody, err := template.RenderSignupTemplate(currentDate, payloads.Name)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusInternalServerError, map[string]any{
+			"message": "failed render mail template",
+			"error":   err.Error(),
+		})
 	}
 
 	err = config.SendMail(payloads.Email, "Sign up activity to Book Store API", emailBody)
@@ -92,7 +95,10 @@ func (u *userController) SignIn(c echo.Context) error {
 
 	emailBody, err := template.RenderSigninTemplate(currentDate, data.Name)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusInternalServerError, map[string]any{
+			"message": "failed render mail template",
+			"error":   err.Error(),
+		})
 	}
 
 	err = config.SendMail(data.Email, "Sign in activity to Book Store API", emailBody)
