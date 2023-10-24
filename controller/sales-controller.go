@@ -109,9 +109,7 @@ func (u *salesController) Checkout(c echo.Context) error {
 	}
 
 	//email
-	salesDate := sales.Date.Format("2006-01-02 15:04:05")
-
-	emailBody, err := template.RenderCheckoutTemplate(sales.Invoice, salesDate, sales.SalesDetails, sales.Total)
+	emailBody, err := template.RenderCheckoutTemplate(sales.Invoice, sales.Date, sales.SalesDetails, sales.Total)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]any{
 			"message": "failed render mail template",
@@ -119,7 +117,7 @@ func (u *salesController) Checkout(c echo.Context) error {
 		})
 	}
 
-	err = config.SendMail(email, "Sign in activity to Book Store API", emailBody)
+	err = config.SendMail(email, "Check out activity to Book Store API", emailBody)
 
     if err != nil {
         return c.JSON(http.StatusInternalServerError, map[string]any{

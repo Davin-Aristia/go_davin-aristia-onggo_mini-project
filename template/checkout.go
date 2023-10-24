@@ -1,12 +1,12 @@
 package template
 
 import (
-    "go-mini-project/model"
+	"go-mini-project/dto"
 
-	"html/template"
 	"bytes"
-    "fmt"
-    "strings"
+	"fmt"
+	"html/template"
+	"strings"
 )
 
 func numberFormat(value float64) string {
@@ -30,7 +30,7 @@ func formatFloat(value float64) string {
     return result + "." + decimalPart
 }
 
-func RenderCheckoutTemplate(invoice, date string, salesDetails []model.SalesDetail, total float64) (string, error) {
+func RenderCheckoutTemplate(invoice, date string, salesDetails []dto.SalesDetailResponse, total float64) (string, error) {
     const checkoutTemplate = `
     <!DOCTYPE html>
     <html>
@@ -89,7 +89,7 @@ func RenderCheckoutTemplate(invoice, date string, salesDetails []model.SalesDeta
             <p>Order details:</p>
             <ul>
                 {{range .SalesDetails}}
-                    <li>{{.Quantity}}x {{.BookId}} - {{numberFormat .Price}}</li>
+                    <li>{{.Quantity}} x {{numberFormat .Price}}</li>
                 {{end}}
             </ul>
             <p>Total: {{numberFormat .Total}}</p>
@@ -109,7 +109,7 @@ func RenderCheckoutTemplate(invoice, date string, salesDetails []model.SalesDeta
     data := struct {
         Invoice      string
         Date         string
-        SalesDetails []model.SalesDetail
+        SalesDetails []dto.SalesDetailResponse
         Total        float64
     }{
         Invoice:      invoice,
