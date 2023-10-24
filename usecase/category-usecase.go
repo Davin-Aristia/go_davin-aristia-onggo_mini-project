@@ -10,10 +10,10 @@ import (
 )
 
 type CategoryUsecase interface {
-	Get(name string) ([]model.Category, error)
-	GetById(id int) (model.Category, error)
-	Create(payloads dto.CategoryRequest) (model.Category, error)
-	Update(payloads dto.CategoryRequest, id int) (model.Category, error)
+	Get(name string) ([]dto.CategoryResponse, error)
+	GetById(id int) (dto.CategoryResponse, error)
+	Create(payloads dto.CategoryRequest) (dto.CategoryResponse, error)
+	Update(payloads dto.CategoryRequest, id int) (dto.CategoryResponse, error)
 	Delete(id int) error
 }
 
@@ -25,40 +25,50 @@ func NewCategoryUsecase(categoryRepo repository.CategoryRepository) *categoryUse
 	return &categoryUsecase{categoryRepository: categoryRepo}
 }
 
-func (s *categoryUsecase) Get(name string) ([]model.Category, error) {
+func (s *categoryUsecase) Get(name string) ([]dto.CategoryResponse, error) {
 	categoryData, err := s.categoryRepository.Get(name)
 	if err != nil {
-		return []model.Category{}, err
+		return []dto.CategoryResponse{}, err
 	}
 
-	return categoryData, nil
+	var categoryResponse []dto.CategoryResponse
+	for _, category := range categoryData {
+		categoryResponse = append(categoryResponse, dto.ConvertToCategoryResponse(category))
+	}
+
+	return categoryResponse, nil
 }
 
-func (s *categoryUsecase) GetById(id int) (model.Category, error) {
+func (s *categoryUsecase) GetById(id int) (dto.CategoryResponse, error) {
 	categoryData, err := s.categoryRepository.GetById(id)
 	if err != nil {
-		return model.Category{}, err
+		return dto.CategoryResponse{}, err
 	}
 
-	return categoryData, nil
+	categoryResponse := dto.ConvertToCategoryResponse(categoryData)
+
+	return categoryResponse, nil
 }
 
-func (s *categoryUsecase) Create(payloads dto.CategoryRequest) (model.Category, error) {
+func (s *categoryUsecase) Create(payloads dto.CategoryRequest) (dto.CategoryResponse, error) {
 	categoryData := model.Category{
 		Name : payloads.Name,
 	}
 
 	categoryData, err := s.categoryRepository.Create(categoryData)
 	if err != nil {
-		return model.Category{}, err
+		return dto.CategoryResponse{}, err
 	}
-	return categoryData, nil
+
+	categoryResponse := dto.ConvertToCategoryResponse(categoryData)
+
+	return categoryResponse, nil
 }
 
-func (s *categoryUsecase) Update(payloads dto.CategoryRequest, id int) (model.Category, error) {
+func (s *categoryUsecase) Update(payloads dto.CategoryRequest, id int) (dto.CategoryResponse, error) {
 	_, err := s.categoryRepository.GetById(id)
 	if err != nil {
-		return model.Category{}, err
+		return dto.CategoryResponse{}, err
 	}
 	
 	categoryData := model.Category{
@@ -67,15 +77,17 @@ func (s *categoryUsecase) Update(payloads dto.CategoryRequest, id int) (model.Ca
 
 	err = s.categoryRepository.Update(categoryData, id)
 	if err != nil {
-		return model.Category{}, err
+		return dto.CategoryResponse{}, err
 	}
 
 	categoryData, err = s.categoryRepository.GetById(id)
 	if err != nil {
-		return model.Category{}, err
+		return dto.CategoryResponse{}, err
 	}
+
+	categoryResponse := dto.ConvertToCategoryResponse(categoryData)
 	
-	return categoryData, nil
+	return categoryResponse, nil
 }
 
 func (s *categoryUsecase) Delete(id int) error {

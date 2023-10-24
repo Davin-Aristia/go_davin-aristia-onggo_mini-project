@@ -11,7 +11,7 @@ import (
 
 type UserUsecase interface {
 	CheckSignIn(email string, password string) (dto.UserResponse, string, error)
-	Create(payloads dto.UserRequest) (model.User, error)
+	Create(payloads dto.UserRequest) (dto.UserResponse, error)
 }
 
 type userUsecase struct {
@@ -42,7 +42,7 @@ func (s *userUsecase) CheckSignIn(email string, password string) (dto.UserRespon
 	return userData, token, customError
 }
 
-func (s *userUsecase) Create(payloads dto.UserRequest) (model.User, error) {
+func (s *userUsecase) Create(payloads dto.UserRequest) (dto.UserResponse, error) {
 	userData := model.User{
 		Name : payloads.Name,
 		Email : payloads.Email,
@@ -53,7 +53,10 @@ func (s *userUsecase) Create(payloads dto.UserRequest) (model.User, error) {
 
 	userData, err := s.userRepository.Create(userData)
 	if err != nil {
-		return model.User{}, err
+		return dto.UserResponse{}, err
 	}
-	return userData, nil
+
+	userResponse := dto.ConvertToUserResponse(userData)
+
+	return userResponse, nil
 }

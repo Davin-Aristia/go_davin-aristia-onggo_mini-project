@@ -8,10 +8,10 @@ import (
 )
 
 type VendorUsecase interface {
-	Get(name string) ([]model.Vendor, error)
-	GetById(id int) (model.Vendor, error)
-	Create(payloads dto.VendorRequest) (model.Vendor, error)
-	Update(payloads dto.VendorRequest, id int) (model.Vendor, error)
+	Get(name string) ([]dto.VendorResponse, error)
+	GetById(id int) (dto.VendorResponse, error)
+	Create(payloads dto.VendorRequest) (dto.VendorResponse, error)
+	Update(payloads dto.VendorRequest, id int) (dto.VendorResponse, error)
 	Delete(id int) error
 }
 
@@ -23,25 +23,32 @@ func NewVendorUsecase(vendorRepo repository.VendorRepository) *vendorUsecase {
 	return &vendorUsecase{vendorRepository: vendorRepo}
 }
 
-func (s *vendorUsecase) Get(name string) ([]model.Vendor, error) {
+func (s *vendorUsecase) Get(name string) ([]dto.VendorResponse, error) {
 	vendorData, err := s.vendorRepository.Get(name)
 	if err != nil {
-		return []model.Vendor{}, err
+		return []dto.VendorResponse{}, err
 	}
 
-	return vendorData, nil
+	var vendorResponse []dto.VendorResponse
+	for _, vendor := range vendorData {
+		vendorResponse = append(vendorResponse, dto.ConvertToVendorResponse(vendor))
+	}
+
+	return vendorResponse, nil
 }
 
-func (s *vendorUsecase) GetById(id int) (model.Vendor, error) {
+func (s *vendorUsecase) GetById(id int) (dto.VendorResponse, error) {
 	vendorData, err := s.vendorRepository.GetById(id)
 	if err != nil {
-		return model.Vendor{}, err
+		return dto.VendorResponse{}, err
 	}
 
-	return vendorData, nil
+	vendorResponse := dto.ConvertToVendorResponse(vendorData)
+
+	return vendorResponse, nil
 }
 
-func (s *vendorUsecase) Create(payloads dto.VendorRequest) (model.Vendor, error) {
+func (s *vendorUsecase) Create(payloads dto.VendorRequest) (dto.VendorResponse, error) {
 	vendorData := model.Vendor{
 		Name : payloads.Name,
 		Address : payloads.Address,
@@ -51,15 +58,18 @@ func (s *vendorUsecase) Create(payloads dto.VendorRequest) (model.Vendor, error)
 
 	vendorData, err := s.vendorRepository.Create(vendorData)
 	if err != nil {
-		return model.Vendor{}, err
+		return dto.VendorResponse{}, err
 	}
-	return vendorData, nil
+
+	vendorResponse := dto.ConvertToVendorResponse(vendorData)
+
+	return vendorResponse, nil
 }
 
-func (s *vendorUsecase) Update(payloads dto.VendorRequest, id int) (model.Vendor, error) {
+func (s *vendorUsecase) Update(payloads dto.VendorRequest, id int) (dto.VendorResponse, error) {
 	_, err := s.vendorRepository.GetById(id)
 	if err != nil {
-		return model.Vendor{}, err
+		return dto.VendorResponse{}, err
 	}
 	
 	vendorData := model.Vendor{
@@ -71,15 +81,17 @@ func (s *vendorUsecase) Update(payloads dto.VendorRequest, id int) (model.Vendor
 
 	err = s.vendorRepository.Update(vendorData, id)
 	if err != nil {
-		return model.Vendor{}, err
+		return dto.VendorResponse{}, err
 	}
 
 	vendorData, err = s.vendorRepository.GetById(id)
 	if err != nil {
-		return model.Vendor{}, err
+		return dto.VendorResponse{}, err
 	}
+
+	vendorResponse := dto.ConvertToVendorResponse(vendorData)
 	
-	return vendorData, nil
+	return vendorResponse, nil
 }
 
 func (s *vendorUsecase) Delete(id int) error {
