@@ -4,6 +4,8 @@ import (
 	"go-mini-project/dto"
 	"go-mini-project/usecase"
 	"go-mini-project/middleware"
+	"go-mini-project/config"
+	"go-mini-project/template"
 
 	"net/http"
 	"strconv"
@@ -83,6 +85,13 @@ func (u *salesController) Checkout(c echo.Context) error {
 		})
 	}
 
+	email := middleware.ExtractTokenUserEmail(c)
+	if email == ""{
+		return c.JSON(http.StatusUnauthorized, map[string]any{
+			"message": "unauthorized",
+		})
+	}
+
 	var payloads dto.SalesRequest
 
 	if err := c.Bind(&payloads); err != nil {
@@ -98,6 +107,27 @@ func (u *salesController) Checkout(c echo.Context) error {
 			"error":   err.Error(),
 		})
 	}
+
+	//email
+	salesDate := sales.Date.Format("2006-01-02 15:04:05")
+
+	emailBody, err := template.RenderCheckoutTemplate(sales.Invoice, salesDate, sales.SalesDetails, sales.Total)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]any{
+			"message": "failed render mail template",
+			"error":   err.Error(),
+		})
+	}
+
+	err = config.SendMail(email, "Sign in activity to Book Store API", emailBody)
+
+    if err != nil {
+        return c.JSON(http.StatusInternalServerError, map[string]any{
+			"message": "failed send email",
+			"error":   err.Error(),
+		})
+    }
+
 
 	return c.JSON(http.StatusOK, map[string]any{
 		"message": "success create sales",
