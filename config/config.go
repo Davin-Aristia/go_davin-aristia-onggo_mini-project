@@ -19,6 +19,7 @@ var (
 	SENDER_NAME string
 	AUTH_EMAIL  string
 	AUTH_PASSWORD  string
+	CHATBOT_KEY  string
 )
 
 func init() {
@@ -38,4 +39,5 @@ func init() {
 	SENDER_NAME = os.Getenv("SENDER_NAME")
 	AUTH_EMAIL  = os.Getenv("AUTH_EMAIL")
 	AUTH_PASSWORD  = os.Getenv("AUTH_PASSWORD")
+	CHATBOT_KEY  = os.Getenv("CHATBOT_KEY")
 }

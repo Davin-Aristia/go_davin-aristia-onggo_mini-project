@@ -9,10 +9,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
+	openai "github.com/sashabaranov/go-openai"
 )
 
 func NewRoute(e *echo.Echo, db *gorm.DB) {
-
 	// Clean Architecture
 	userRepository := repository.NewUserRepository(db)
 	userService := usecase.NewUserUsecase(userRepository)
@@ -37,6 +37,11 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	purchaseRepository := repository.NewPurchaseRepository(db)
 	purchaseService := usecase.NewPurchaseUsecase(purchaseRepository, bookRepository)
 	purchaseController := controller.NewPurchaseController(purchaseService)
+	
+	client := openai.NewClient(config.CHATBOT_KEY)
+	chatbotRepository := repository.NewChatbotRepository(client)
+	chatbotService := usecase.NewChatbotUsecase(chatbotRepository, categoryRepository, bookRepository)
+	chatbotController := controller.NewChatbotController(chatbotService)
 
 	//JWT Group
 	r := e.Group("")
@@ -71,4 +76,6 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	r.POST("/purchases", purchaseController.CreatePurchase)
 	r.GET("/purchases/:id", purchaseController.GetPurchaseById)
 	r.GET("/purchases", purchaseController.GetPurchase)
+
+	r.POST("/chatbots/book-recommendation", chatbotController.BookRecommendation)
 }

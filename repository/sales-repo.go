@@ -1,7 +1,6 @@
 package repository
 
 import (
-	// "go-mini-project/dto"
 	"go-mini-project/model"
 
 	"gorm.io/gorm"
