@@ -35,7 +35,6 @@ func (s *chatbotUsecase) GetLaptopRecommendation(request dto.ChatbotRequest) (st
 		return "", err
 	}
 
-    // content := "Give my customer book recommendation from my store. Here is the list of books in my store with its categories:"
     content := "I am a customer from certain book store that have list of books:"
 
     for _, category := range categoryData {
@@ -45,7 +44,6 @@ func (s *chatbotUsecase) GetLaptopRecommendation(request dto.ChatbotRequest) (st
         }
     }
 
-    // content += "\n\nand here is my customer chat: " + request.Content
     content += "\n" + request.Content
 
     fmt.Println("content: ", content)

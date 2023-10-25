@@ -18,8 +18,6 @@ func SendMail(email_to, subject, template string) error {
 		return err
 	}
 
-	// dialer := &gomail.Dialer{Host: SMTP_HOST, Port: port}
-
     dialer := gomail.NewDialer(
         SMTP_HOST,
         port,
