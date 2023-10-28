@@ -49,4 +49,4 @@ jobs:
             docker rm miniProject
             docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/go-mini-project
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/go-mini-project
-            docker run -d -p 8080:8080 --name miniProject ${{ secrets.DOCKERHUB_USERNAME }}/go-mini-project:latest
+            docker run -d -p 8080:8080 --env-file .env --name miniProject ${{ secrets.DOCKERHUB_USERNAME }}/go-mini-project:latest
