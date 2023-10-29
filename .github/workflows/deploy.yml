@@ -1,9 +1,9 @@
 name: Deploy App to Server
 
 on:
-  push:
+  pull_request:
     branches:
-      - deployment
+      - development
 
 jobs:
   docker:
