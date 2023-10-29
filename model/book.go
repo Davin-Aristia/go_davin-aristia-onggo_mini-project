@@ -6,7 +6,7 @@ import (
 )
 
 type Book struct {
-	*gorm.Model
+	gorm.Model
 
 	Title  		string 	`json:"title" validate:"required" gorm:"type:varchar(255)"`
 	Author 		string 	`json:"author" validate:"required" gorm:"type:varchar(255)"`

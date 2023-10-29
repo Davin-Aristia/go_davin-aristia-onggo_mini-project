@@ -6,7 +6,7 @@ import (
 )
 
 type Vendor struct {
-	*gorm.Model
+	gorm.Model
 
 	Name    	string 		`json:"name" validate:"required" gorm:"type:varchar(255)"`
 	Address    	string 		`json:"address" validate:"required" gorm:"type:varchar(255)"`
