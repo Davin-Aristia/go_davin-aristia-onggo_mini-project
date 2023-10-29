@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"go-mini-project/dto"
@@ -45,8 +44,6 @@ func (s *chatbotUsecase) GetLaptopRecommendation(request dto.ChatbotRequest) (st
     }
 
     content += "\n" + request.Content
-
-    fmt.Println("content: ", content)
 
     ctx := context.Background()
     messages := []openai.ChatCompletionMessage{

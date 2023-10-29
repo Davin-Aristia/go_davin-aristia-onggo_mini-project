@@ -6,7 +6,7 @@ import (
 )
 
 type Category struct {
-	*gorm.Model
+	gorm.Model
 
 	Name  string `json:"name" validate:"required" gorm:"type:varchar(255)"`
 	Books []Book `gorm:foreignKey:CategoryId`

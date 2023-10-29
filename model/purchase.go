@@ -7,7 +7,7 @@ import (
 )
 
 type Purchase struct {
-	*gorm.Model
+	gorm.Model
 
 	VendorId 		uint 			 `json:"vendorId" validate:"required"`
 	PurchaseOrder 	string 			 `json:"purchaseOrder" validate:"required" gorm:"type:char(19);unique_index"`
@@ -23,7 +23,7 @@ func ValidatePurchaseRequest(purchase *Purchase) error {
 
 
 type PurchaseDetail struct {
-	*gorm.Model
+	gorm.Model
 
 	PurchaseId 	uint `json:"purchaseId" validate:"required"`
 	BookId 		uint `json:"bookId" validate:"required"`
