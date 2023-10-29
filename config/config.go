@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -23,10 +22,11 @@ var (
 )
 
 func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Cannot load env file. Err: %s", err)
-	}
+	godotenv.Load(".env")
+	// err := godotenv.Load(".env")
+	// if err != nil {
+	// 	log.Fatalf("Cannot load env file. Err: %s", err)
+	// }
 
 	JWT_KEY = os.Getenv("JWT_KEY")
 	DB_USERNAME = os.Getenv("DB_USERNAME")
