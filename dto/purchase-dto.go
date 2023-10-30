@@ -15,7 +15,7 @@ type PurchaseRequest struct {
 }
 
 type PurchaseDetailRequest struct {
-	BookID   uint    `json:"bookId" form:"bookId"`
+	BookID   uint    `json:"book_id" form:"book_id"`
 	Price    float64 `json:"price" form:"price"`
 	Quantity int     `json:"quantity" form:"quantity"`
 	Subtotal float64 `json:"subtotal" form:"subtotal"`
