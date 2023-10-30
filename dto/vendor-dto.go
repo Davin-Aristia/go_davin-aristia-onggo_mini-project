@@ -8,7 +8,7 @@ type VendorRequest struct {
 	Name    string `json:"name" form:"name"`
 	Email    string `json:"email" form:"email"`
 	Address string `json:"address" form:"address"`
-	PhoneNumber string `json:"phoneNumber" form:"phoneNumber"`
+	PhoneNumber string `json:"phone_number" form:"phone_number"`
 }
 
 type VendorResponse struct {
@@ -16,7 +16,7 @@ type VendorResponse struct {
 	Name        string `json:"name"`
 	Address     string `json:"address"`
 	Email       string `json:"email"`
-	PhoneNumber string `json:"phoneNumber"`
+	PhoneNumber string `json:"phone_number"`
 }
 
 func ConvertToVendorResponse(vendor model.Vendor) VendorResponse {
