@@ -29,6 +29,7 @@ type SalesDetail struct {
 	Price 	  float64 `json:"price" validate:"required" gorm:"type:decimal(15,2)"`
 	Quantity  int `json:"quantity" validate:"required"`
 	Subtotal  float64 `json:"subtotal" validate:"required" gorm:"type:decimal(15,2)"`
+	Book 	  Book `gorm:"foreignKey:BookId" validate:"-"`
 }
 
 func ValidateSalesDetailRequest(salesDetail *SalesDetail) error {

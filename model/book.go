@@ -13,6 +13,7 @@ type Book struct {
 	Price  		float64 `json:"price" validate:"required" gorm:"type:decimal(15,2)"`
 	Stock  		int 	`json:"stock"`
 	CategoryId 	uint 	`json:"categoryId" validate:"required"`
+	Category 	Category `gorm:"foreignKey:CategoryId" validate:"-"`
 }
 
 func ValidateBookRequest(book *Book) error {
