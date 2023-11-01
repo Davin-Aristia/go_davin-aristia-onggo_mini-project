@@ -53,8 +53,8 @@ type SalesDetailResponse struct {
 	ID         uint    `json:"id"`
 	SalesId    uint    `json:"sales_id"`
 	BookId     uint    `json:"book_id"`
-	Title  	   string  `json:"title"`
-	Author 	   string  `json:"author"`
+	BookTitle  string  `json:"book_title"`
+	BookAuthor string  `json:"book_author"`
 	Price      float64 `json:"price"`
 	Quantity   int     `json:"quantity"`
 	Subtotal   float64 `json:"subtotal"`
@@ -65,8 +65,8 @@ func ConvertToSalesDetailResponse(detail model.SalesDetail) SalesDetailResponse 
 		ID:       detail.ID,
 		SalesId:  detail.SalesId,
 		BookId:   detail.BookId,
-		Title:    detail.Book.Title,
-		Author:   detail.Book.Author,
+		BookTitle:    detail.Book.Title,
+		BookAuthor:   detail.Book.Author,
 		Price:    detail.Price,
 		Quantity: detail.Quantity,
 		Subtotal: detail.Subtotal,

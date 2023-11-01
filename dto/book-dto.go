@@ -19,7 +19,7 @@ type BookResponse struct {
 	Price      float64 `json:"price"`
 	Stock      int     `json:"stock"`
 	CategoryId int     `json:"category_id"`
-	Category   string  `json:"category"`
+	CategoryName   string  `json:"category_name"`
 }
 
 func ConvertToBookResponse(book model.Book) BookResponse {
@@ -30,6 +30,6 @@ func ConvertToBookResponse(book model.Book) BookResponse {
 		Price:      book.Price,
 		Stock:      book.Stock,
 		CategoryId: int(book.CategoryId),
-		Category: 	book.Category.Name,
+		CategoryName: 	book.Category.Name,
 	}
 }

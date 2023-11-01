@@ -89,7 +89,7 @@ func RenderCheckoutTemplate(invoice, date string, salesDetails []dto.SalesDetail
             <p>Order details:</p>
             <ul>
                 {{range .SalesDetails}}
-                    <li>{{.Quantity}} x {{.Title}} by {{.Author}} @ {{numberFormat .Price}} = {{numberFormat .Subtotal}}</li>
+                    <li>{{.Quantity}} x {{.BookTitle}} by {{.BookAuthor}} @ {{numberFormat .Price}} = {{numberFormat .Subtotal}}</li>
                 {{end}}
             </ul>
             <p>Total: {{numberFormat .Total}}</p>
