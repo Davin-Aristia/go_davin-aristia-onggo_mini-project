@@ -24,7 +24,7 @@ type PurchaseDetailRequest struct {
 type PurchaseResponse struct {
 	ID         		uint     `json:"id"`
 	VendorId     	uint     `json:"vendor_id"`
-	Vendor	     	string   `json:"vendor"`
+	VendorName	    string   `json:"vendor_name"`
 	PurchaseOrder   string   `json:"purchase_order"`
 	Date       		string   `json:"date"`
 	Total      		float64  `json:"total"`
@@ -35,7 +35,7 @@ func ConvertToPurchaseResponse(purchase model.Purchase) PurchaseResponse {
 	purchaseResponse := PurchaseResponse{
 		ID:         	purchase.ID,
 		VendorId:     	purchase.VendorId,
-		Vendor:     	purchase.Vendor.Name,
+		VendorName:    	purchase.Vendor.Name,
 		PurchaseOrder:  purchase.PurchaseOrder,
 		Date:       	purchase.Date.Format("2006-01-02 15:04:05"),
 		Total:      	purchase.Total,
@@ -55,8 +55,8 @@ type PurchaseDetailResponse struct {
 	ID       uint    `json:"id"`
 	PurchaseId  uint `json:"purchase_id"`
 	BookId   uint    `json:"book_id"`
-	Title  	   string  `json:"title"`
-	Author 	   string  `json:"author"`
+	BookTitle  	   string  `json:"book_title"`
+	BookAuthor 	   string  `json:"book_author"`
 	Price    float64 `json:"price"`
 	Quantity int     `json:"quantity"`
 	Subtotal float64 `json:"subtotal"`
@@ -67,8 +67,8 @@ func ConvertToPurchaseDetailResponse(detail model.PurchaseDetail) PurchaseDetail
 		ID:       	detail.ID,
 		PurchaseId: detail.PurchaseId,
 		BookId:   	detail.BookId,
-		Title:    	detail.Book.Title,
-		Author:   	detail.Book.Author,
+		BookTitle:    	detail.Book.Title,
+		BookAuthor:   	detail.Book.Author,
 		Price:    	detail.Price,
 		Quantity: 	detail.Quantity,
 		Subtotal: 	detail.Subtotal,
