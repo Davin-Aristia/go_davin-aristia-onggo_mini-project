@@ -39,7 +39,8 @@ func (r *bookRepository) Get(title, author string, category int) ([]model.Book, 
         tx = tx.Where("category_id = ?", category)
     }
 
-	tx.Find(&bookData)
+	tx.Preload("Category").Find(&bookData)
+
 	if tx.Error != nil {
 		return []model.Book{}, tx.Error
 	}
@@ -49,7 +50,7 @@ func (r *bookRepository) Get(title, author string, category int) ([]model.Book, 
 func (r *bookRepository) GetById(id int) (model.Book, error) {
 	var bookData model.Book
 
-	tx := r.db.First(&bookData, id)
+	tx := r.db.Preload("Category").First(&bookData, id)
 
 	if tx.Error != nil {
 		return model.Book{}, tx.Error
@@ -67,6 +68,11 @@ func (r *bookRepository) Create(data model.Book) (model.Book, error) {
 	if tx.Error != nil {
 		return model.Book{}, tx.Error
 	}
+	
+    if err := r.db.Model(&data).Preload("Category").First(&data).Error; err != nil {
+        return model.Book{}, err
+    }
+	
 	return data, nil
 }
 

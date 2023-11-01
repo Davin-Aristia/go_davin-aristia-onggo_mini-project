@@ -43,7 +43,7 @@ func (r *purchaseRepository) Get(purchaseOrder string, vendor int) ([]model.Purc
         tx = tx.Where("vendor_id = ?", vendor)
     }
 
-	tx.Preload("PurchaseDetails").Find(&purchaseData)
+	tx.Preload("Vendor").Preload("PurchaseDetails").Preload("PurchaseDetails.Book").Find(&purchaseData)
 	if tx.Error != nil {
 		return []model.Purchase{}, tx.Error
 	}
@@ -53,7 +53,7 @@ func (r *purchaseRepository) Get(purchaseOrder string, vendor int) ([]model.Purc
 func (r *purchaseRepository) GetById(id int) (model.Purchase, error) {
 	var purchaseData model.Purchase
 
-	tx := r.db.Preload("PurchaseDetails").First(&purchaseData, id)
+	tx := r.db.Preload("Vendor").Preload("PurchaseDetails").Preload("PurchaseDetails.Book").First(&purchaseData, id)
 
 	if tx.Error != nil {
 		return model.Purchase{}, tx.Error
