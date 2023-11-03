@@ -45,7 +45,7 @@ func (r *salesRepository) Get(invoice string, user int) ([]model.Sales, error) {
         tx = tx.Where("user_id = ?", user)
     }
 
-	tx.Preload("SalesDetails").Find(&salesData)
+	tx.Preload("SalesDetails").Preload("SalesDetails.Book").Find(&salesData)
 	if tx.Error != nil {
 		return []model.Sales{}, tx.Error
 	}
@@ -55,7 +55,7 @@ func (r *salesRepository) Get(invoice string, user int) ([]model.Sales, error) {
 func (r *salesRepository) GetById(id int) (model.Sales, error) {
 	var salesData model.Sales
 
-	tx := r.db.Preload("SalesDetails").First(&salesData, id)
+	tx := r.db.Preload("SalesDetails").Preload("SalesDetails.Book").First(&salesData, id)
 
 	if tx.Error != nil {
 		return model.Sales{}, tx.Error

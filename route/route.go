@@ -43,39 +43,54 @@ func NewRoute(e *echo.Echo, db *gorm.DB) {
 	chatbotService := usecase.NewChatbotUsecase(chatbotRepository, categoryRepository, bookRepository)
 	chatbotController := controller.NewChatbotController(chatbotService)
 
-	//JWT Group
-	r := e.Group("")
-	r.Use(middleware.JWT([]byte(config.JWT_KEY)))
-
 	// Route to handler function
+	// auth
 	e.POST("/users/signin", userController.SignIn)
 	e.POST("/users", userController.SignUp)
 
+	// books
+	books := e.Group("/books")
+	books.Use(middleware.JWT([]byte(config.JWT_KEY)))
 	e.GET("/books", bookController.GetBooks)
 	e.GET("/books/:id", bookController.GetBookById)
-	r.POST("/books", bookController.InsertBook)
-	r.PUT("/books/:id", bookController.UpdateBook)
-	r.DELETE("/books/:id", bookController.DeleteBook)
+	books.POST("", bookController.InsertBook)
+	books.PUT("/:id", bookController.UpdateBook)
+	books.DELETE("/:id", bookController.DeleteBook)
 
+	// categories
+	categories := e.Group("/categories")
+	categories.Use(middleware.JWT([]byte(config.JWT_KEY)))
 	e.GET("/categories", categoryController.GetCategories)
 	e.GET("/categories/:id", categoryController.GetCategoryById)
-	r.POST("/categories", categoryController.InsertCategory)
-	r.PUT("/categories/:id", categoryController.UpdateCategory)
-	r.DELETE("/categories/:id", categoryController.DeleteCategory)
+	categories.POST("", categoryController.InsertCategory)
+	categories.PUT("/:id", categoryController.UpdateCategory)
+	categories.DELETE("/:id", categoryController.DeleteCategory)
 	
-	r.POST("/checkout", salesController.Checkout)
-	r.GET("/sales/:id", salesController.GetSalesById)
-	r.GET("/sales", salesController.GetSales)
+	// sales
+	sales := e.Group("/sales")
+	sales.Use(middleware.JWT([]byte(config.JWT_KEY)))
+	sales.POST("/checkout", salesController.Checkout)
+	sales.GET("/:id", salesController.GetSalesById)
+	sales.GET("", salesController.GetSales)
 	
-	r.GET("/vendors", vendorController.GetVendors)
-	r.GET("/vendors/:id", vendorController.GetVendorById)
-	r.POST("/vendors", vendorController.InsertVendor)
-	r.PUT("/vendors/:id", vendorController.UpdateVendor)
-	r.DELETE("/vendors/:id", vendorController.DeleteVendor)
+	// vendors
+	vendors := e.Group("/vendors")
+	vendors.Use(middleware.JWT([]byte(config.JWT_KEY)))
+	vendors.GET("", vendorController.GetVendors)
+	vendors.GET("/:id", vendorController.GetVendorById)
+	vendors.POST("", vendorController.InsertVendor)
+	vendors.PUT("/:id", vendorController.UpdateVendor)
+	vendors.DELETE("/:id", vendorController.DeleteVendor)
 	
-	r.POST("/purchases", purchaseController.CreatePurchase)
-	r.GET("/purchases/:id", purchaseController.GetPurchaseById)
-	r.GET("/purchases", purchaseController.GetPurchase)
+	// purchases
+	purchases := e.Group("/purchases")
+	purchases.Use(middleware.JWT([]byte(config.JWT_KEY)))
+	purchases.POST("", purchaseController.CreatePurchase)
+	purchases.GET("/:id", purchaseController.GetPurchaseById)
+	purchases.GET("", purchaseController.GetPurchase)
 
-	r.POST("/chatbots/book-recommendation", chatbotController.BookRecommendation)
+	// chatbots
+	chatbots := e.Group("/chatbots")
+	chatbots.Use(middleware.JWT([]byte(config.JWT_KEY)))
+	chatbots.POST("/book-recommendation", chatbotController.BookRecommendation)
 }
